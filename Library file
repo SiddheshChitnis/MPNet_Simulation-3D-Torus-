@@ -1,0 +1,51 @@
+
+import peersim.core.Network;
+
+import peersim.core.Node; import peersim.core.CommonState; import peersim.edsim.EDSimulator;
+
+import java.io.*;
+
+public class Library {
+
+public static long netSpeed;
+public static long latency;
+public static BufferedWriter bw;
+public static long numOperaFinished;
+public static long numAllOpera;
+public static boolean allowParallel;
+
+public static long numMsg;
+public static int dimSize;
+
+public static int getDimSize(int num)
+{
+    return (int)Math.cbrt((double)(num));
+}
+
+public static void initLib(int numServer)
+{
+    Library.netSpeed = 10L * 1024L * 1024L * 1024L;
+    Library.latency = 100L;
+
+}   
+public static long commOverhead(long msgSize)
+{
+    return msgSize / Library.netSpeed + Library.latency;
+}
+
+public static int[] onetoThreeMapping(int index, int dimSize) throws ArithmeticException
+{
+    int[] coordinate = new int[3];
+//  System.out.println("Test"+dimSize);
+    coordinate[0] = index / (dimSize * dimSize); 
+    coordinate[1] = (index - coordinate[0] * (dimSize * dimSize)) / dimSize;
+    coordinate[2] = index % dimSize;
+    return coordinate;
+}
+
+public static int threetoOneMapping(int[] coordinate, int dimSize)
+{
+    return coordinate[0] * dimSize * dimSize + coordinate[1] * dimSize + coordinate[2];
+}
+
+}
