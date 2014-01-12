@@ -1,0 +1,155 @@
+import peersim.config.Configuration; import peersim.core.CommonState; import peersim.core.Network; import peersim.core.Node; import peersim.edsim.EDProtocol; import peersim.edsim.EDSimulator;
+
+import java.util.; import java.io.;
+
+public class PeerProtocol implements EDProtocol { private static final String PARA_TRANPORT = "transport"; private static final String PARA_NUMSERVER = "numServer";
+
+private Parameters par;
+private int numServer;
+
+public int id;
+
+public String prefix;
+
+public int[] coordinate;
+public int[] neighbor;
+
+public PeerProtocol(String prefix)
+{
+    this.prefix = prefix;
+    par = new Parameters();
+    par.tid = Configuration.getPid(prefix + "." + PARA_TRANPORT);
+
+    numServer = Configuration.getInt(prefix + "." + PARA_NUMSERVER);
+
+}
+
+public int[]  path(int[] source,int[] desti)
+ {
+
+
+             if (Arrays.equals(source, desti))
+             {    
+                 System.out.println(" \n\n**************DESTINATION REACHED*********** ");
+             }
+
+
+                int diff1 = desti[0]-source[0];
+                int diff2 = desti[1]-source[1];
+                int diff3 = desti[2]-source[2];
+
+                if (diff1>0)
+                {
+
+                for ( int p = 0 ; p<diff1 ; p++)
+                {
+                    source[0]=source[0]+1;
+                    break;
+                            //System.out.print("---->"+source[0]+""+source[1]+""+source[2]);
+                }
+                }
+                else if(diff1<0)
+                {   
+                    for ( int p = 0 ; p<Math.abs(diff1) ; p++)
+                    {
+                        source[0]=source[0]-1;
+                        break;
+                                //System.out.print("---->"+source[0]+""+source[1]+""+source[2]);
+                    }
+                }
+
+
+
+
+                else if(diff2>0)
+                {
+
+                for ( int p = 0 ; p<diff2 ; p++)
+                {
+                    source[1]=source[1]+1;
+                    break;
+                            //System.out.print("---->"+source[0]+""+source[1]+""+source[2]);
+                }
+                }
+                else if((diff2<0))
+                {
+
+                    for ( int p = 0 ; p<Math.abs(diff2) ; p++)
+                    {
+                        source[1]=source[1]-1;
+                        break;
+                                //System.out.print("---->"+source[0]+""+source[1]+""+source[2]);
+                    }
+                }
+
+                else if (diff3>0)
+                {
+
+                for ( int p = 0 ; p<diff3 ; p++)
+                {
+                    source[2]=source[2]+1;
+                    break;
+                            //System.out.print("---->"+source[0]+""+source[1]+""+source[2]);
+                }
+                }
+                else if(diff3<0)
+                {
+
+                    for ( int p = 0 ; p<Math.abs(diff3) ; p++)
+                    {
+                        source[2]=source[2]-1;
+                        break;
+                                //System.out.print("---->"+source[0]+""+source[1]+""+source[2]);
+                    }
+                }
+
+
+                //System.out.println(" \n\n**************DESTINATION REACHED*********** ");
+        return source;                          
+
+ }
+
+public void getCoordinate()
+{
+    coordinate = Library.onetoThreeMapping(id, Library.dimSize);
+}
+
+public void processEvent(Node node, int pid, Object event)
+{
+    par.pid = pid;
+    Message msg = (Message)event;
+    int dest = msg.terminationid;
+    Library.numMsg++;
+    if (dest == id)
+    {
+
+        System.out.println("The throughput is:" + ((double)Library.numMsg / 
+                CommonState.getTime()));
+        System.out.println("The no of links used is :"+Library.numMsg);
+        int edge;
+        edge = Network.size() + 4; 
+        System.out.println("Total no of links available is:"+edge);
+        return;
+    }
+
+    int[] destCoordiate = Library.onetoThreeMapping(dest, Library.dimSize);
+    //System.out.println("**"+coordinate[0]+"**"+coordinate[1]+"**"+coordinate[2]);
+    int[] inter = path(coordinate, destCoordiate);
+    int interIndex = Library.threetoOneMapping(inter, Library.dimSize);
+    Message msgNext = new Message(msg.originSenderid, id, 
+    interIndex, msg.data, msg.datasize, msg.terminationid);
+    //System.out.println("**"+Library.commOverhead((long)msg.datasize)+"**");
+    long time = CommonState.getTime() + Library.commOverhead((long)msg.datasize);
+    //System.out.println("$$"+CommonState.getTime()+"$$");
+    Node nodeNext = (Node)Network.get(interIndex);
+    EDSimulator.add(time, msgNext, nodeNext, pid);
+}
+
+public Object clone()
+{
+    PeerProtocol pp = new PeerProtocol(prefix);
+    //pp.hm = new HashMap<String, String>();
+    return pp;
+}
+
+}
