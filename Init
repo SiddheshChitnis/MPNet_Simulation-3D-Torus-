@@ -1,0 +1,41 @@
+import peersim.core.*; import peersim.config.Configuration;
+
+public class KVSInit implements Control { private static final String PAR_PROT = "protocol"; private static final String PAR_NUMSERVER = "numServer"; /** protocol id */ private int pid = 0;
+
+/** number of servers */
+private int numServer;
+public KVSInit(String prefix)
+{
+    pid = Configuration.getPid(prefix + "." + PAR_PROT);
+    numServer = Configuration.getInt(prefix + "." + PAR_NUMSERVER);
+}
+
+/**
+ * the method to run when running this initialization class
+ */
+public boolean execute()
+{
+    System.out.println("The number of server is:" + numServer);
+    Library.initLib(numServer);
+    Library.dimSize = Library.getDimSize(numServer);
+    System.out.println("The dimension is:" + Library.dimSize);
+    for (int i = 0;i < Network.size();i++)
+    {
+        Node node = (Node)Network.get(i);
+
+        /** get the protocol for a node */
+        PeerProtocol pp = (PeerProtocol)node.getProtocol(pid);
+
+        /** set the node id to be consecutive integers */
+        pp.id = i;
+
+        pp.getCoordinate();
+    }
+    System.out.println("The number of server is:" + numServer);
+    Library.initLib(numServer);
+    Library.dimSize = Library.getDimSize(numServer);
+    System.out.println("The dimension is:" + Library.dimSize);
+    return false;
+}
+
+}
