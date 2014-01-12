@@ -1,0 +1,13 @@
+public class Message { public int originSenderid; public int currentSenderid; public int nextSenderid; public String data; public double datasize; public int terminationid;
+
+public Message(int osId, int cSid, int nSid, String data, double ds, int tID)
+{
+    this.originSenderid = osId;
+    this.currentSenderid = cSid;
+    this.nextSenderid = nSid;
+    this.data = data;
+    this.datasize = ds;
+    this.terminationid = tID;
+}
+
+}
