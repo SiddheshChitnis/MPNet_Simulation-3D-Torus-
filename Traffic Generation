@@ -1,0 +1,36 @@
+import peersim.core.*; import peersim.config.Configuration; import peersim.edsim.EDSimulator;
+
+import java.util.; import java.io.;
+
+public class TrafficGene implements Control { private static final String PAR_PROT = "protocol"; private static final String PAR_NUMSERVER = "numServer";
+
+private final int pid;
+private final int numServer;
+
+public TrafficGene(String prefix)
+{
+    pid = Configuration.getPid(prefix + "." + PAR_PROT);
+    numServer = Configuration.getInt(prefix + "." + PAR_NUMSERVER, 1);
+}
+
+public boolean execute()
+{
+    int size = Network.size();
+//  for(int i=0;i<1000;i++)
+//  {
+    Message msg = new Message(0, 0, -1, "Hello, "
+            + "I am sending you a message", 100,9999);
+    Node node = (Node)Network.get(0);
+    PeerProtocol pp = (PeerProtocol)node.getProtocol(pid);
+    int[] tmp = Library.onetoThreeMapping(Network.size() - 1, Library.dimSize);
+    int[] inter = pp.path(pp.coordinate, tmp);
+    int interId = Library.threetoOneMapping(inter, Library.dimSize);
+    msg.nextSenderid = interId;
+    long time = Library.commOverhead((long)msg.datasize);
+    Node destNode = (Node)Network.get(interId);
+    EDSimulator.add(time, msg, destNode, pid);
+//  }
+    return false;
+}
+
+}
