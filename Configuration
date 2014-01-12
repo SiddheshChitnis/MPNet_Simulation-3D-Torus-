@@ -1,0 +1,16 @@
+simulation.endtime 10^16 simulation.logtime 10^6
+
+simulation.experiments 1
+
+network.size 10000
+
+protocol.tr UniformRandomTransport { mindelay 9 maxdelay 10
+
+}
+
+protocol.node PeerProtocol { transport tr numServer 10000 }
+
+init.create KVSInit { protocol node numServer 10000 }
+
+control.workloadgene TrafficGene
+{ protocol node numServer 10000 step simulation.endtime }
